@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>For you</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <p class="eyebrow">A little bouquet for you</p>
+    <h1>Tap a rose</h1>
+    <p class="intro">Each flower holds a song and a reason it reminds me of you.</p>
+    <svg id="bouquet" viewBox="0 0 400 480" role="img" aria-label="Bouquet of roses">
+      <g stroke="#5f8a4a" stroke-width="4" fill="none">
+        <path d="M185 345L188 465"/><path d="M200 345V468"/><path d="M215 345L212 465"/>
+      </g>
+      <path d="M150 345Q135 405 160 465Q200 480 240 465Q265 405 250 345Z"
+            fill="#9fc6d6" fill-opacity=".3" stroke="#7fa6b6" stroke-width="1.5"/>
+      <g id="sway"><g id="ferns"></g><g id="breath"></g><g id="roses"></g></g>
+      <g fill="#a1121c">
+        <path d="M245 338C205 305 198 348 236 348Z"/>
+        <path d="M245 338C292 305 298 352 256 350Z"/>
+        <path d="M240 348L218 405L238 394L246 414L252 349Z"/>
+        <path d="M252 349L278 400L259 393L253 414Z"/>
+        <circle cx="247" cy="342" r="8" fill="#7d0a12"/>
+      </g>
+    </svg>
+    <section id="card" aria-live="polite">
+      <h2 id="title">Each one is a song</h2>
+      <p id="artist"></p>
+      <p id="note"></p>
+      <p id="status" class="status">Choose a rose to begin.</p>
+    </section>
+    <section id="notes-panel" aria-labelledby="notes-title">
+      <h2 id="notes-title">Notes for you</h2>
+      <ol id="revealed-notes" aria-live="polite"></ol>
+    </section>
+    <button id="reset" type="button">Close all roses</button>
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
