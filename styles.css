@@ -15,7 +15,7 @@ svg { width: 100%; display: block; }
 .rose .turn { transform-box: fill-box; transform-origin: center; transform: scale(.8);
               transition: transform .7s cubic-bezier(.3,1.6,.5,1); }
 .rose .turn { transform: scale(1.05); }
-.rose:hover .turn, .rose:focus-visible .turn { transform: scale(1.15); }
+.rose:focus-visible .turn { transform: scale(1.15); }
 .rose.open .turn { transform: scale(1.55) rotate(30deg); }
 .rose .inner { transform-box: fill-box; transform-origin: center;
                transform: scale(.5); transition: transform .7s; }
@@ -24,6 +24,10 @@ svg { width: 100%; display: block; }
 .rose .core { fill: var(--d); }
 .red   { --p: #b5121b; --d: #7d0a12; }
 .white { --p: #f7f2ea; --d: #c9bba9; }
+
+@media (hover: hover) {
+  .rose:hover .turn { transform: scale(1.15); }
+}
 
 #sway { transform-origin: 200px 340px; animation: sway 5s ease-in-out infinite; }
 @keyframes sway { 50% { transform: rotate(1.2deg); } }
@@ -52,9 +56,4 @@ svg { width: 100%; display: block; }
 @media (max-width: 420px) {
   main { padding-top: 1.25rem; }
   svg { margin-top: -.25rem; }
-}
-
-@media (max-width: 600px) and (prefers-reduced-motion: no-preference) {
-  #sway { animation: none; }
-  .rose .turn, .rose .inner { transition-duration: .35s; }
 }
