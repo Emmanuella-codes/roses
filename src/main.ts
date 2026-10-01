@@ -1,5 +1,6 @@
 import { FlowerProgress } from "./progress.js";
 import { finale, flowerTones, notes } from "./songs.js";
+import finaleAudioUrl from "../audio/Rema_Addicted.mp3";
 
 const NS = "http://www.w3.org/2000/svg";
 const SPOTS: [number, number][] = [
@@ -94,7 +95,7 @@ function playFinale() {
   stop();
   title.textContent = finale.title;
   artist.textContent = finale.artist;
-  const finalAudio = new Audio(`audio/${finale.file}`);
+  const finalAudio = new Audio(finaleAudioUrl);
   finalAudio.preload = "auto";
   audio = finalAudio;
   finalAudio.play().catch(() => {
