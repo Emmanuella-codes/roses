@@ -1,4 +1,4 @@
-import { finale, notes, songs, SNIPPET_SECONDS } from "./songs.js";
+import { finale, notes, songs } from "./songs.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const SPOTS: [number, number][] = [
@@ -17,7 +17,6 @@ const title = $<HTMLElement>("#title");
 const artist = $<HTMLElement>("#artist");
 const note = $<HTMLElement>("#note");
 const status = $<HTMLElement>("#status");
-const revealedNotes = $<HTMLOListElement>("#revealed-notes");
 const resetButton = $<HTMLButtonElement>("#reset");
 
 function mk<K extends keyof SVGElementTagNameMap>(
@@ -53,20 +52,22 @@ for (let k = 0; k < 170; k++) {
 
 // Audio
 let audio: HTMLAudioElement | null = null;
-let stopTimer: number | undefined;
-let current: SVGGElement | null = null;
 const openedFlowers = new Set<number>();
 let finalePlayed = false;
+let noteOrder: string[] = [];
+
+function shuffledNotes() {
+  const shuffled = [...notes];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 function renderNotes() {
   const revealedCount = Math.min(Math.floor(openedFlowers.size / 6), notes.length);
-  revealedNotes.replaceChildren();
-
-  notes.slice(0, revealedCount).forEach((message) => {
-    const item = document.createElement("li");
-    item.textContent = message;
-    revealedNotes.appendChild(item);
-  });
+  note.textContent = revealedCount > 0 ? noteOrder[revealedCount - 1] : "";
 
   if (revealedCount === notes.length && !finalePlayed) {
     finalePlayed = true;
@@ -88,19 +89,20 @@ function reset() {
   note.textContent = "";
   openedFlowers.clear();
   finalePlayed = false;
-  revealedNotes.replaceChildren();
+  noteOrder = shuffledNotes();
   status.textContent = "Choose a rose to begin.";
   resetButton.disabled = true;
 }
 
 function stop() {
-    clearTimeout(stopTimer);
     audio?.pause();
     audio = null;
 }
 
 function playFinale() {
   stop();
+  title.textContent = finale.title;
+  artist.textContent = finale.artist;
   const finalAudio = new Audio(`audio/${finale.file}`);
   finalAudio.addEventListener("loadedmetadata", () => {
     finalAudio.currentTime = finale.start;
@@ -110,43 +112,22 @@ function playFinale() {
 }
 
 function toggle(g: SVGGElement, i: number) {
-    const song = songs[i % songs.length];
     if (g.classList.contains("open")) return;
     g.classList.add("open");
     g.setAttribute("aria-pressed", "true");
-    current = g;
-    stop();
-
-    title.textContent = song.title;
-    artist.textContent = song.artist;
-    note.textContent = song.note;
-    status.textContent = "A little song for you.";
     resetButton.disabled = false;
-    g.setAttribute("aria-pressed", "true");
     openedFlowers.add(i);
     renderNotes();
-
-    if (openedFlowers.size === notes.length * 6) return;
-
-    const a = new Audio(`audio/${song.file}`);
-    a.addEventListener("loadedmetadata", () => {
-    a.currentTime = song.start;
-    a.play().catch(() => {});
-    }, { once: true });
-    audio = a;
-    stopTimer = window.setTimeout(() => {
-    stop();
-    }, SNIPPET_SECONDS * 1000);
 }
 
-// Roses: one per song
+// Roses: thirty flowers, with the existing song tones used for visual variation
 SPOTS.forEach((_, i) => {
     const song = songs[i % songs.length];
     const [x, y] = SPOTS[i];
     const g = mk("g", {
     class: `rose ${song.tone ?? "red"}`, transform: `translate(${x} ${y}) rotate(${(i % 5 - 2) * 4})`,
     tabindex: 0, role: "button", "aria-pressed": "false",
-    "aria-label": `${song.title} by ${song.artist}`,
+    "aria-label": `Rose ${i + 1}`,
     }, roses);
     const turn = mk("g", { class: "turn" }, g);
     for (let k = 0; k < 5; k++)
@@ -159,7 +140,6 @@ SPOTS.forEach((_, i) => {
     g.addEventListener("click", () => toggle(g, i));
     g.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(g, i); }
-    if (e.key === "Escape" && current === g) toggle(g, i);
     });
 });
 
@@ -169,7 +149,6 @@ resetButton.addEventListener("click", () => {
     rose.setAttribute("aria-pressed", "false");
   });
   stop();
-  current = null;
   reset();
 });
 

@@ -34,12 +34,6 @@ svg { width: 100%; display: block; }
 #artist { margin: 2px 0 6px; font-size: .8rem; color: #8a6a6a; }
 #note { margin: 0; font-family: Georgia, serif; font-style: italic; line-height: 1.5; }
 .status { margin: 12px 0 0; color: #9a6972; font-size: .75rem; }
-#notes-panel { margin-top: 1rem; padding: 14px 16px; border: 1px solid rgba(199, 132, 140, .55);
-               border-radius: 12px; background: rgba(255, 248, 245, .08); text-align: left; }
-#notes-title { margin: 0 0 .55rem; color: #ffe1dd; font-size: .85rem; font-weight: 500; }
-#revealed-notes { margin: 0; padding-left: 1.35rem; color: #f7d8d5; font-family: Georgia, serif;
-                  font-style: italic; line-height: 1.5; }
-#revealed-notes li { padding-left: .25rem; margin: .25rem 0; }
 #reset { margin-top: .8rem; padding: .6rem 1rem; border: 1px solid #c7848c; border-radius: 999px;
          background: rgba(255, 255, 255, .06); color: #ffe1dd; cursor: pointer; font: inherit; font-size: .8rem;
          transition: background .2s, color .2s, opacity .2s; }
