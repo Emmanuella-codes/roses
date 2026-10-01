@@ -1,4 +1,5 @@
-import { finale, notes, songs } from "./songs.js";
+import { FlowerProgress } from "./progress.js";
+import { finale, flowerTones, notes } from "./songs.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const SPOTS: [number, number][] = [
@@ -18,6 +19,7 @@ const artist = $<HTMLElement>("#artist");
 const note = $<HTMLElement>("#note");
 const status = $<HTMLElement>("#status");
 const resetButton = $<HTMLButtonElement>("#reset");
+const progress = new FlowerProgress(notes);
 
 function mk<K extends keyof SVGElementTagNameMap>(
   tag: K, attrs: Record<string, string | number>, parent?: Element
@@ -39,10 +41,11 @@ for (let k = 0; k < 18; k++) {
   }, ferns);
 }
 
-// Baby's breath: seeded scatter so it looks the same every load
+// Baby's breath: use fewer decorative nodes on small screens for faster rendering.
 let seed = 7;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-for (let k = 0; k < 170; k++) {
+const breathCount = window.matchMedia("(max-width: 600px)").matches ? 80 : 170;
+for (let k = 0; k < breathCount; k++) {
     const a = rnd() * Math.PI * 2, d = Math.sqrt(rnd());
     const y = 185 + Math.sin(a) * d * 140;
     if (y > 305) continue;
@@ -52,30 +55,19 @@ for (let k = 0; k < 170; k++) {
 
 // Audio
 let audio: HTMLAudioElement | null = null;
-const openedFlowers = new Set<number>();
 let finalePlayed = false;
-let noteOrder: string[] = [];
-
-function shuffledNotes() {
-  const shuffled = [...notes];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
 
 function renderNotes() {
-  const revealedCount = Math.min(Math.floor(openedFlowers.size / 6), notes.length);
-  note.textContent = revealedCount > 0 ? noteOrder[revealedCount - 1] : "";
+  const revealedCount = progress.revealedCount;
+  note.textContent = revealedCount > 0 ? progress.revealedMessages[revealedCount - 1] : "";
 
-  if (revealedCount === notes.length && !finalePlayed) {
+  if (progress.shouldPlayFinale && !finalePlayed) {
     finalePlayed = true;
     playFinale();
   }
 
   if (revealedCount < notes.length) {
-    const remainder = openedFlowers.size % 6;
+    const remainder = progress.openedCount % 6;
     const flowersUntilNext = remainder === 0 ? 6 : 6 - remainder;
     status.textContent = `${revealedCount} of ${notes.length} notes revealed — ${flowersUntilNext} more flower${flowersUntilNext === 1 ? "" : "s"} to go.`;
   } else {
@@ -84,12 +76,11 @@ function renderNotes() {
 }
 
 function reset() {
-  title.textContent = "Each one is a song";
+  title.textContent = "A little note for you";
   artist.textContent = "";
   note.textContent = "";
-  openedFlowers.clear();
+  progress.reset();
   finalePlayed = false;
-  noteOrder = shuffledNotes();
   status.textContent = "Choose a rose to begin.";
   resetButton.disabled = true;
 }
@@ -104,11 +95,8 @@ function playFinale() {
   title.textContent = finale.title;
   artist.textContent = finale.artist;
   const finalAudio = new Audio(`audio/${finale.file}`);
-  finalAudio.addEventListener("loadedmetadata", () => {
-    finalAudio.currentTime = finale.start;
-    finalAudio.play().catch(() => {});
-  }, { once: true });
   audio = finalAudio;
+  finalAudio.play().catch(() => {});
 }
 
 function toggle(g: SVGGElement, i: number) {
@@ -116,16 +104,15 @@ function toggle(g: SVGGElement, i: number) {
     g.classList.add("open");
     g.setAttribute("aria-pressed", "true");
     resetButton.disabled = false;
-    openedFlowers.add(i);
+    progress.open(i);
     renderNotes();
 }
 
 // Roses: thirty flowers, with the existing song tones used for visual variation
 SPOTS.forEach((_, i) => {
-    const song = songs[i % songs.length];
     const [x, y] = SPOTS[i];
     const g = mk("g", {
-    class: `rose ${song.tone ?? "red"}`, transform: `translate(${x} ${y}) rotate(${(i % 5 - 2) * 4})`,
+    class: `rose ${flowerTones[i]}`, transform: `translate(${x} ${y}) rotate(${(i % 5 - 2) * 4})`,
     tabindex: 0, role: "button", "aria-pressed": "false",
     "aria-label": `Rose ${i + 1}`,
     }, roses);

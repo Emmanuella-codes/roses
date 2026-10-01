@@ -42,10 +42,18 @@ svg { width: 100%; display: block; }
 .rose:focus-visible .turn { filter: drop-shadow(0 0 6px #f2b6ba); }
 
 @media (prefers-reduced-motion: reduce) {
-  #sway { animation: none; } .rose .turn, .rose .inner { transition: none; }
+  #sway { animation: none; }
+  .rose .turn, .rose .inner { transition: none; }
+  .rose.open .turn { transform: scale(1.15); }
+  .rose.open .inner { transform: scale(.8); }
 }
 
 @media (max-width: 420px) {
   main { padding-top: 1.25rem; }
   svg { margin-top: -.25rem; }
+}
+
+@media (max-width: 600px) and (prefers-reduced-motion: no-preference) {
+  #sway { animation: none; }
+  .rose .turn, .rose .inner { transition-duration: .35s; }
 }
