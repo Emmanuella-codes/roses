@@ -10,7 +10,8 @@ h1 { font-weight: 500; font-size: clamp(1.3rem, 5vw, 1.7rem); margin: .45rem 0 .
 .intro { max-width: 32rem; margin: 0 auto; color: #d6bfc1; font-size: .9rem; line-height: 1.5; }
 svg { width: 100%; display: block; }
 
-.rose { cursor: pointer; outline: none; }
+.rose { cursor: pointer; outline: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.rose .hit-area { fill: transparent; pointer-events: all; }
 .rose .turn { transform-box: fill-box; transform-origin: center; transform: scale(.8);
               transition: transform .7s cubic-bezier(.3,1.6,.5,1); }
 .rose .turn { transform: scale(1.05); }

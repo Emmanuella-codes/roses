@@ -95,12 +95,18 @@ function playFinale() {
   title.textContent = finale.title;
   artist.textContent = finale.artist;
   const finalAudio = new Audio(`audio/${finale.file}`);
+  finalAudio.preload = "auto";
   audio = finalAudio;
-  finalAudio.play().catch(() => {});
+  finalAudio.play().catch(() => {
+    status.textContent = "Tap the bouquet once more to play the finale song.";
+  });
 }
 
 function toggle(g: SVGGElement, i: number) {
-    if (g.classList.contains("open")) return;
+    if (g.classList.contains("open")) {
+      if (progress.shouldPlayFinale && audio?.paused) playFinale();
+      return;
+    }
     g.classList.add("open");
     g.setAttribute("aria-pressed", "true");
     resetButton.disabled = false;
@@ -116,6 +122,7 @@ SPOTS.forEach((_, i) => {
     tabindex: 0, role: "button", "aria-pressed": "false",
     "aria-label": `Rose ${i + 1}`,
     }, roses);
+    mk("circle", { class: "hit-area", r: 16 }, g);
     const turn = mk("g", { class: "turn" }, g);
     for (let k = 0; k < 5; k++)
     mk("ellipse", { class: "outer", cy: -9, rx: 10, ry: 12, transform: `rotate(${k * 72})` }, turn);
@@ -124,7 +131,9 @@ SPOTS.forEach((_, i) => {
     mk("ellipse", { cy: -5, rx: 6, ry: 8, transform: `rotate(${k * 72 + 36})` }, inner);
     mk("circle", { class: "core", r: 3 }, inner);
 
-    g.addEventListener("click", () => toggle(g, i));
+    g.addEventListener("pointerup", (e) => {
+      if (e.button === 0) toggle(g, i);
+    });
     g.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(g, i); }
     });
